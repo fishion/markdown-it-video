@@ -12,9 +12,9 @@ function youtube_parser (url) {
   return match && match[7].length === 11 ? match[7] : url;
 }
 
-/*eslint-disable max-len */
+/* eslint-disable max-len */
 var vimeo_regex = /https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|)(\d+)(?:$|\/|\?)/;
-/*eslint-enable max-len */
+/* eslint-enable max-len */
 function vimeo_parser (url) {
   var match = url.match(vimeo_regex);
   return match && typeof match[3] === 'string' ? match[3] : url;
@@ -115,6 +115,7 @@ function video_url(service, videoID, options) {
       'landing_data=bHVZZmNaNDBIWnNjdEVENDRhZDFNZGNIUE43MHdLNWpsdFJLb2ZHanI5N1lQVHkxSHFxazZ0UUNCRHloSXZROHh3PT0&amp;' +
       'landing_sign=1kD6c0N6aYpMUS0wxnQjxzSqZlEB8qNFdxtdjYhwSuI';
   }
+  return '';
 }
 
 function tokenize_video(md, options) {
@@ -123,8 +124,8 @@ function tokenize_video(md, options) {
     var service = md.utils.escapeHtml(tokens[idx].service).toLowerCase();
     return videoID === '' ? '' :
       '<div class="embed-responsive embed-responsive-16by9"><iframe class="embed-responsive-item" id="' +
-      service + 'player" type="text/html" width="' + (options[service].width) +
-      '" height="' + (options[service].height) +
+      service + 'player" type="text/html" width="' + options[service].width +
+      '" height="' + options[service].height +
       '" src="' + options.url(service, videoID, options) +
       '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
   }

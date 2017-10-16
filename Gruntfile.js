@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 module.exports = function(grunt) {
-  
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -15,7 +15,7 @@ module.exports = function(grunt) {
           'dist/<%= pkg.name %>.min.js': ['index.js']
         }
       }
-    }  
+    }
 
   });
 

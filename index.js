@@ -5,7 +5,7 @@
 // Process @[vine](vineVideoID)
 // Process @[prezi](preziID)
 
-(function() { 
+(function() {
 
   var self = this; // root will be window object in browser context
 

@@ -1,0 +1,6 @@
+Coverage. Youtube from ID
+.
+@[youtube](dQw4w9WgXcQ)
+.
+<p><iframe src="//www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></p>
+.

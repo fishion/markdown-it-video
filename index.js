@@ -149,7 +149,6 @@
   }
 
   function video_plugin(md, options) {
-    console.log(options);
     if (options) {
       Object.keys(services).forEach(function(service) {
         if (typeof options[service] === 'undefined') {

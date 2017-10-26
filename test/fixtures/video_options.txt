@@ -4,3 +4,15 @@ Coverage. Youtube from ID
 .
 <p><iframe src="//www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></p>
 .
+
+Coverage. more than one video
+.
+@[youtube](x) text @[youtube](y)
+.
+<p><iframe src="//www.youtube.com/embed/x" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> text <iframe src="//www.youtube.com/embed/y" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></p>
+.
+.
+@[youtube](x) [regular link](y) text @[youtube](z)
+.
+<p><iframe src="//www.youtube.com/embed/x" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <a href="y">regular link</a> text <iframe src="//www.youtube.com/embed/z" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></p>
+.

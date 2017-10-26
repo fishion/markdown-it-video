@@ -63,67 +63,6 @@
   /* eslint-enable max-len */
   /* eslint-enable no-unused-vars */
 
-
-  function video_embed(md) {
-    return function(state, silent) {
-      var serviceEnd,
-        serviceStart,
-        token,
-        oldPos = state.pos;
-
-      if (state.src.charCodeAt(oldPos) !== 0x40/* @ */ ||
-          state.src.charCodeAt(oldPos + 1) !== 0x5B/* [ */) {
-        return false;
-      }
-
-      var EMBED = /@\[([a-zA-Z].+)\]\([\s]*(.*?)[\s]*[\)]/im;
-      var match = EMBED.exec(state.src);
-
-      if (!match || match.length < 3) {
-        return false;
-      }
-
-      var service = match[1];
-      var videoID = match[2];
-      var serviceLower = service.toLowerCase();
-
-      if (services[serviceLower]) {
-        videoID = services[serviceLower].parser(videoID);
-      } else {
-        return false;
-      }
-
-      // If the videoID field is empty, regex currently make it the close parenthesis.
-      if (videoID === ')') {
-        videoID = '';
-      }
-
-      serviceStart = oldPos + 2;
-      serviceEnd = md.helpers.parseLinkLabel(state, oldPos + 1, false);
-
-      //
-      // We found the end of the link, and know for a fact it's a valid link;
-      // so all that's left to do is to call tokenizer.
-      //
-      if (!silent) {
-        state.pos = serviceStart;
-        state.posMax = serviceEnd;
-        state.service = state.src.slice(serviceStart, serviceEnd);
-        var newState = new state.md.inline.State(service, state.md, state.env, []);
-        newState.md.inline.tokenize(newState);
-
-        token = state.push('video', '');
-        token.videoID = videoID;
-        token.service = service;
-        token.level = state.level;
-      }
-
-      state.pos = state.pos + state.src.indexOf(')', state.pos);
-      state.posMax = state.tokens.length;
-      return true;
-    };
-  }
-
   function iframeparams(options, service) {
     if (options.plainiframe) {return '';}
     return ' class="embed-responsive-item"'
@@ -133,12 +72,61 @@
       + ' height="' + options[service].options.height + '"';
   }
 
-  function tokenize_video(md, options) {
+  function tokenize_video(state, silent) {
+    var start = state.pos,
+      max = state.posMax;
+
+    // check first 2 chars look like what we're after
+    if (state.src.charCodeAt(start) !== 0x40/* @ */ ||
+        state.src.charCodeAt(start + 1) !== 0x5B/* [ */) {
+      return false;
+    }
+
+    var EMBED_RE = /@\[([a-zA-Z].+?)\]\(\s*(.*?)\s*\)/im;
+    var match = EMBED_RE.exec(state.src.slice(start));
+
+    // did we match the 2 capture groups?
+    if (!match || match.length < 3) { return false; }
+
+    // check it's a valid service and clean videoId
+    var service = match[1];
+    var videoID = match[2];
+    if (!services[service.toLowerCase()]) { return false; }
+    videoID = services[service.toLowerCase()].parser(videoID);
+
+    // check we've not gone too far
+    var theend = state.src.indexOf(')', start) + 1;
+    if (theend > max) { return false; }
+
+    //
+    // We found the end of the link, and know for a fact it's a valid link;
+    // so all that's left to do is to call tokenizer.
+    //
+    if (!silent) {
+      var serviceStart = start + 2;
+      var serviceEnd = state.md.helpers.parseLinkLabel(state, start + 1, false);
+      state.pos = serviceStart;
+      state.posMax = serviceEnd;
+
+      state.service = state.src.slice(serviceStart, serviceEnd);
+
+      var token = state.push('video', '');
+      token.videoID = videoID;
+      token.service = service;
+      token.level = state.level;
+    }
+
+    state.pos = theend;
+    state.posMax = max;
+
+    return true;
+  }
+
+  function render_video_tokens(md, options) {
     return function(tokens, idx) {
       var videoID = md.utils.escapeHtml(tokens[idx].videoID);
       var service = md.utils.escapeHtml(tokens[idx].service).toLowerCase();
       if (videoID === '') { return ''; }
-
 
       var html = '<iframe' + iframeparams(options, service) + ' src="' + options[service].url(videoID, options) + '"';
       html += ' frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
@@ -164,8 +152,8 @@
     } else {
       options = services;
     }
-    md.renderer.rules.video = tokenize_video(md, options);
-    md.inline.ruler.before('emphasis', 'video', video_embed(md));
+    md.renderer.rules.video = render_video_tokens(md, options);
+    md.inline.ruler.after('link', 'video', tokenize_video);
   }
 
   if (typeof exports !== 'undefined') {
